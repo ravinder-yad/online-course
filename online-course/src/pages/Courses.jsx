@@ -10,12 +10,11 @@ import {
 } from "react-icons/fa";
 import { HiOutlineAcademicCap } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 // --- SUB-COMPONENTS ---
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
-import { coursesData } from "../data/courses";
 
 const CourseCard = ({ course }) => (
     <motion.div
@@ -79,15 +78,35 @@ const CourseCard = ({ course }) => (
 );
 
 const Courses = () => {
+    const [courses, setCourses] = useState([]);
     const [activeCategory, setActiveCategory] = useState("All");
     const [priceRange, setPriceRange] = useState(500);
     const [viewMode, setViewMode] = useState("grid");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const categories = ["All", "Web Development", "Human Design", "Data Intelligence", "Growth Marketing"];
 
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                setIsLoading(true);
+                const res = await axios.get("/api/courses");
+                setCourses(res.data);
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching courses:", err);
+                setError("Failed to load courses. Please try again later.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCourses();
+    }, []);
+
     const filteredCourses = activeCategory === "All"
-        ? coursesData
-        : coursesData.filter(c => c.category === activeCategory);
+        ? courses.filter(c => c.price <= priceRange)
+        : courses.filter(c => c.category === activeCategory && c.price <= priceRange);
 
     return (
         <div className="bg-slate-50 min-h-screen">
@@ -185,13 +204,30 @@ const Courses = () => {
                         </div>
 
                         {/* Course Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <AnimatePresence mode="popLayout">
-                                {filteredCourses.map(course => (
-                                    <CourseCard key={course.id} course={course} />
-                                ))}
-                            </AnimatePresence>
-                        </div>
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-40">
+                                <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+                                <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">Loading Courses...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="text-center py-40 bg-rose-50 rounded-[3rem] border border-rose-100 p-12">
+                                <h3 className="text-2xl font-black text-rose-600 mb-4">{error}</h3>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-8 py-4 bg-rose-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all"
+                                >
+                                    Retry Connection
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <AnimatePresence mode="popLayout">
+                                    {filteredCourses.map(course => (
+                                        <CourseCard key={course.id || course._id} course={course} />
+                                    ))}
+                                </AnimatePresence>
+                            </div>
+                        )}
 
                         {/* Empty State */}
                         {filteredCourses.length === 0 && (

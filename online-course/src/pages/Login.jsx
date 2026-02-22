@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     FaEnvelope, FaLock, FaEye, FaEyeSlash,
@@ -8,9 +8,31 @@ import {
 import { HiOutlineAcademicCap } from "react-icons/hi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const { login } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setIsLoading(true);
+        try {
+            await login(email, password);
+            navigate("/");
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
@@ -65,7 +87,12 @@ const Login = () => {
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">Access Your Learning Dashboard</p>
                             </div>
 
-                            <form className="space-y-8">
+                            <form className="space-y-8" onSubmit={handleSubmit}>
+                                {error && (
+                                    <div className="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-rose-600 text-[10px] font-bold uppercase tracking-widest animate-shake">
+                                        {error}
+                                    </div>
+                                )}
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] ml-2">Email Address</label>
                                     <div className="relative group">
@@ -74,6 +101,9 @@ const Login = () => {
                                         </div>
                                         <input
                                             type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
                                             placeholder="name@email.com"
                                             className="w-full bg-gray-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-[1.5rem] py-6 pl-16 pr-8 outline-none text-sm font-bold text-gray-950 transition-all"
                                         />
@@ -91,6 +121,9 @@ const Login = () => {
                                         </div>
                                         <input
                                             type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
                                             placeholder="••••••••"
                                             className="w-full bg-gray-50 border-2 border-transparent focus:border-indigo-100 focus:bg-white rounded-[1.5rem] py-6 pl-16 pr-16 outline-none text-sm font-bold text-gray-950 transition-all"
                                         />
@@ -105,10 +138,12 @@ const Login = () => {
                                 </div>
 
                                 <motion.button
+                                    type="submit"
+                                    disabled={isLoading}
                                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-indigo-600 text-white rounded-[1.5rem] py-6 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition-all"
+                                    className="w-full bg-indigo-600 text-white rounded-[1.5rem] py-6 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    Sign In Now
+                                    {isLoading ? "Signing in..." : "Sign In Now"}
                                 </motion.button>
                             </form>
 

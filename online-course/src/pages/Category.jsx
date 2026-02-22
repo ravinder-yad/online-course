@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
     FaCode, FaDatabase, FaPaintBrush, FaBullhorn, FaStar, FaClock,
     FaUsers, FaArrowRight, FaPlayCircle, FaChevronRight
@@ -12,6 +13,9 @@ import { useCart } from "../context/CartContext";
 
 const Category = () => {
     const { id } = useParams();
+    const [courses, setCourses] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const { addToCart } = useCart();
 
@@ -22,12 +26,7 @@ const Category = () => {
             color: "indigo",
             accent: "blue",
             tagline: "Master the art of building world-class digital experiences.",
-            stats: { students: "12k+", courses: "48+", mentors: "15" },
-            courses: [
-                { id: 1, title: "Full-Stack React Mastery", instructor: "Sarah Drasner", rating: 4.9, students: 2400, length: "24h 30m", price: 99, image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop" },
-                { id: 6, title: "Advanced Node.js Architecture", instructor: "Ryan Dahl", rating: 4.8, students: 1800, length: "18h 15m", price: 89, image: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&auto=format&fit=crop" },
-                { id: 7, title: "Modern CSS with Tailwind", instructor: "Adam Wathan", rating: 5.0, students: 3500, length: "12h 45m", price: 49, image: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=800&auto=format&fit=crop" }
-            ]
+            stats: { students: "12k+", courses: "48+", mentors: "15" }
         },
         "data-intelligence": {
             title: "Data Intelligence",
@@ -35,11 +34,7 @@ const Category = () => {
             color: "green",
             accent: "emerald",
             tagline: "Turn complex data into powerful insights and decisions.",
-            stats: { students: "8k+", courses: "32+", mentors: "12" },
-            courses: [
-                { id: 4, title: "Python for Data Science", instructor: "Andrew Ng", rating: 4.9, students: 5200, length: "40h 00m", price: 129, image: "https://images.unsplash.com/photo-1551288049-bbda48658a7d?w=800&auto=format&fit=crop" },
-                { id: 5, title: "Machine Learning Boot Camp", instructor: "Fei-Fei Li", rating: 4.7, students: 2100, length: "35h 20m", price: 149, image: "https://images.unsplash.com/photo-1527474305487-b87b222841cc?w=800&auto=format&fit=crop" }
-            ]
+            stats: { students: "8k+", courses: "32+", mentors: "12" }
         },
         "human-design": {
             title: "Human Design",
@@ -47,11 +42,7 @@ const Category = () => {
             color: "rose",
             accent: "pink",
             tagline: "Create interfaces that resonate with human psychology.",
-            stats: { students: "10k+", courses: "28+", mentors: "10" },
-            courses: [
-                { id: 8, title: "UI/UX Fundamentals", instructor: "Gary Simon", rating: 4.8, students: 4100, length: "15h 45m", price: 79, image: "https://images.unsplash.com/photo-1586717791821-3f44a563dc4c?w=800&auto=format&fit=crop" },
-                { id: 9, title: "Visual Storytelling", instructor: "Chris Do", rating: 4.9, students: 3200, length: "20h 10m", price: 95, image: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800&auto=format&fit=crop" }
-            ]
+            stats: { students: "10k+", courses: "28+", mentors: "10" }
         },
         "growth-marketing": {
             title: "Growth Marketing",
@@ -59,15 +50,33 @@ const Category = () => {
             color: "purple",
             accent: "violet",
             tagline: "Scale products with modern growth strategies.",
-            stats: { students: "15k+", courses: "40+", mentors: "18" },
-            courses: [
-                { id: 10, title: "Performance Marketing 101", instructor: "Neil Patel", rating: 4.6, students: 6300, length: "22h 30m", price: 59, image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop" },
-                { id: 11, title: "SEO Strategy 2024", instructor: "Brian Dean", rating: 4.9, students: 4500, length: "16h 00m", price: 75, image: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=800&auto=format&fit=crop" }
-            ]
+            stats: { students: "15k+", courses: "40+", mentors: "18" }
         }
     };
 
-    const cat = categories[id] || categories["web-development"];
+    const catInfo = categories[id] || categories["web-development"];
+
+    useEffect(() => {
+        const fetchCategoryCourses = async () => {
+            try {
+                setIsLoading(true);
+                const res = await axios.get("/api/courses");
+                // The API doesn't have a specific category filter endpoint yet, so we filter here
+                // We need to match catInfo.title with course.category
+                const filtered = res.data.filter(c => c.category === catInfo.title);
+                setCourses(filtered);
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching category courses:", err);
+                setError("Failed to load courses for this category.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCategoryCourses();
+    }, [id, catInfo.title]);
+
+    const cat = catInfo;
 
     const colorClasses = {
         indigo: "from-indigo-600 to-blue-600 shadow-indigo-200 text-indigo-600 bg-indigo-50",
@@ -138,66 +147,82 @@ const Category = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        {cat.courses.map((course) => (
-                            <motion.div
-                                key={course.id}
-                                whileHover={{ y: -15 }}
-                                className="group bg-white rounded-[3rem] overflow-hidden border border-gray-100 hover:shadow-[0_45px_100px_-30px_rgba(0,0,0,0.1)] transition-all duration-500"
-                            >
-                                <div className="relative h-64 overflow-hidden">
-                                    <img src={course.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
-                                    <div className="absolute top-6 right-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black text-gray-950 uppercase tracking-widest shadow-xl">
-                                        ${course.price}
-                                    </div>
-                                    <div className="absolute bottom-6 left-6 flex items-center gap-2">
-                                        <div className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Best Seller</div>
-                                    </div>
-                                </div>
-
-                                <div className="p-10">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-2 text-yellow-400">
-                                            <FaStar size={12} />
-                                            <span className="text-sm font-black text-gray-950">{course.rating}</span>
-                                            <span className="text-[10px] font-bold text-gray-400">({course.students})</span>
+                    {isLoading ? (
+                        <div className="flex flex-col items-center justify-center py-40">
+                            <div className={`w-16 h-16 border-4 border-${cat.color}-100 border-t-${cat.color}-600 rounded-full animate-spin mb-6`}></div>
+                            <p className={`text-${cat.color}-600 font-black uppercase tracking-[0.2em] text-[10px]`}>Loading {cat.title} Courses...</p>
+                        </div>
+                    ) : error ? (
+                        <div className={`text-center py-40 bg-${cat.color}-50 rounded-[3rem] border border-${cat.color}-100 p-12`}>
+                            <h3 className={`text-2xl font-black text-${cat.color}-600 mb-4`}>{error}</h3>
+                        </div>
+                    ) : courses.length === 0 ? (
+                        <div className="text-center py-40">
+                            <h3 className="text-2xl font-black text-gray-950 mb-2">No Courses Found</h3>
+                            <p className="text-gray-400 font-bold tracking-tight">We're still curating the perfect paths for this category.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {courses.map((course) => (
+                                <motion.div
+                                    key={course._id || course.id}
+                                    whileHover={{ y: -15 }}
+                                    className="group bg-white rounded-[3rem] overflow-hidden border border-gray-100 hover:shadow-[0_45px_100px_-30px_rgba(0,0,0,0.1)] transition-all duration-500"
+                                >
+                                    <div className="relative h-64 overflow-hidden">
+                                        <img src={course.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="" />
+                                        <div className="absolute top-6 right-6 px-4 py-2 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-black text-gray-950 uppercase tracking-widest shadow-xl">
+                                            ${course.price}
                                         </div>
-                                        <div className="flex items-center gap-2 text-gray-400">
-                                            <FaClock size={12} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest">{course.length}</span>
+                                        <div className="absolute bottom-6 left-6 flex items-center gap-2">
+                                            <div className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest">Best Seller</div>
                                         </div>
                                     </div>
 
-                                    <Link to={`/course/${course.id}`}>
-                                        <h3 className="text-2xl font-black text-gray-950 tracking-tighter mb-4 group-hover:text-indigo-600 transition-colors leading-tight">{course.title}</h3>
-                                    </Link>
-
-                                    <div className="flex items-center justify-between mt-10 pt-8 border-t border-gray-50">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
-                                                <FaUsers size={16} />
+                                    <div className="p-10">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="flex items-center gap-2 text-yellow-400">
+                                                <FaStar size={12} />
+                                                <span className="text-sm font-black text-gray-950">{course.rating}</span>
+                                                <span className="text-[10px] font-bold text-gray-400">({course.reviews})</span>
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest leading-none mb-1">Instructor</p>
-                                                <p className="text-sm font-bold text-gray-950">{course.instructor}</p>
+                                            <div className="flex items-center gap-2 text-gray-400">
+                                                <FaClock size={12} />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">{course.duration}</span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => addToCart({ id: course.id, title: course.title, price: course.price, image: course.image })}
-                                                className={`p-4 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all bg-${cat.color}-50 text-${cat.color}-600 hover:bg-${cat.color}-600 hover:text-white`}
-                                            >
-                                                Add to Cart
-                                            </button>
-                                            <Link to={`/course/${course.id}`} className={`w-12 h-12 bg-gray-50 group-hover:bg-${cat.color}-600 group-hover:text-white rounded-2xl flex items-center justify-center transition-all`}>
-                                                <FaArrowRight size={14} />
-                                            </Link>
+
+                                        <Link to={`/course/${course.id}`}>
+                                            <h3 className="text-2xl font-black text-gray-950 tracking-tighter mb-4 group-hover:text-indigo-600 transition-colors leading-tight line-clamp-2">{course.title}</h3>
+                                        </Link>
+
+                                        <div className="flex items-center justify-between mt-10 pt-8 border-t border-gray-50">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
+                                                    <img src={course.instructorImg} alt="" className="w-full h-full object-cover" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest leading-none mb-1">Instructor</p>
+                                                    <p className="text-sm font-bold text-gray-950">{course.instructor}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    onClick={() => addToCart({ id: course._id || course.id, title: course.title, price: course.price, image: course.image })}
+                                                    className={`px-4 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all bg-${cat.color}-50 text-${cat.color}-600 hover:bg-${cat.color}-600 hover:text-white`}
+                                                >
+                                                    Add
+                                                </button>
+                                                <Link to={`/course/${course.id}`} className={`w-12 h-12 bg-gray-50 group-hover:bg-${cat.color}-600 group-hover:text-white rounded-2xl flex items-center justify-center transition-all`}>
+                                                    <FaArrowRight size={14} />
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

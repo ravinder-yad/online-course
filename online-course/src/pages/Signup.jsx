@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
     FaEnvelope, FaLock, FaEye, FaEyeSlash,
@@ -7,9 +7,32 @@ import {
 } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const { signup } = useAuth();
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setIsLoading(true);
+        try {
+            await signup(name, email, password);
+            navigate("/");
+        } catch (err) {
+            setError(err.response?.data?.message || "Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-rose-100 selection:text-rose-900">
@@ -64,7 +87,12 @@ const Signup = () => {
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">Become a Part of EduFlow Academy</p>
                             </div>
 
-                            <form className="space-y-6">
+                            <form className="space-y-6" onSubmit={handleSubmit}>
+                                {error && (
+                                    <div className="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-rose-600 text-[10px] font-bold uppercase tracking-widest animate-shake">
+                                        {error}
+                                    </div>
+                                )}
                                 <div className="space-y-4">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] ml-2">Full Name</label>
                                     <div className="relative group">
@@ -73,6 +101,9 @@ const Signup = () => {
                                         </div>
                                         <input
                                             type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            required
                                             placeholder="John Doe"
                                             className="w-full bg-gray-50 border-2 border-transparent focus:border-rose-100 focus:bg-white rounded-[1.5rem] py-6 pl-16 pr-8 outline-none text-sm font-bold text-gray-950 transition-all"
                                         />
@@ -87,6 +118,9 @@ const Signup = () => {
                                         </div>
                                         <input
                                             type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
                                             placeholder="name@email.com"
                                             className="w-full bg-gray-50 border-2 border-transparent focus:border-rose-100 focus:bg-white rounded-[1.5rem] py-6 pl-16 pr-8 outline-none text-sm font-bold text-gray-950 transition-all"
                                         />
@@ -101,6 +135,9 @@ const Signup = () => {
                                         </div>
                                         <input
                                             type={showPassword ? "text" : "password"}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
                                             placeholder="••••••••"
                                             className="w-full bg-gray-50 border-2 border-transparent focus:border-rose-100 focus:bg-white rounded-[1.5rem] py-6 pl-16 pr-16 outline-none text-sm font-bold text-gray-950 transition-all"
                                         />
@@ -115,10 +152,12 @@ const Signup = () => {
                                 </div>
 
                                 <motion.button
+                                    type="submit"
+                                    disabled={isLoading}
                                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                                    className="w-full bg-rose-600 text-white rounded-[1.5rem] py-6 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-rose-200 hover:bg-rose-700 transition-all"
+                                    className="w-full bg-rose-600 text-white rounded-[1.5rem] py-6 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl shadow-rose-200 hover:bg-rose-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
                                 >
-                                    Create Account
+                                    {isLoading ? "Creating account..." : "Create Account"}
                                 </motion.button>
                             </form>
 

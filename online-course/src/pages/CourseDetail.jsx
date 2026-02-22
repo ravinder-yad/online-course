@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
     FaStar, FaClock, FaUsers, FaArrowLeft, FaPlay, FaCheck,
     FaLock, FaGlobe, FaCertificate, FaInfinity
@@ -10,21 +11,49 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import PaymentModal from "../components/PaymentModal";
 import { useCart } from "../context/CartContext";
-import { coursesData } from "../data/courses";
 
 const CourseDetail = () => {
     const { id: courseId } = useParams();
+    const [course, setCourse] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const { addToCart } = useCart();
 
-    const course = coursesData.find(c => c.id === parseInt(courseId)) || coursesData[0];
+    useEffect(() => {
+        const fetchCourse = async () => {
+            try {
+                setLoading(true);
+                const res = await axios.get(`/api/courses/${courseId}`);
+                setCourse(res.data);
+                setError(null);
+            } catch (err) {
+                console.error("Error fetching course:", err);
+                setError("Course not found or server error.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCourse();
+    }, [courseId]);
 
-    if (!course) {
+    if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white">
+                <Navbar initialScrolled={true} />
+                <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+                <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">Loading Course Details...</p>
+            </div>
+        );
+    }
+
+    if (error || !course) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-white">
                 <Navbar initialScrolled={true} />
                 <h1 className="text-4xl font-black text-gray-950 mb-4">Course Not Found</h1>
-                <Link to="/courses" className="text-indigo-600 font-bold uppercase tracking-widest text-xs">Back to Catalog</Link>
+                <p className="text-gray-500 mb-8">{error || "Could not find the course you are looking for."}</p>
+                <Link to="/courses" className="text-indigo-600 font-black uppercase tracking-widest text-[10px] bg-indigo-50 px-8 py-4 rounded-2xl hover:bg-indigo-100 transition-all">Back to Catalog</Link>
             </div>
         );
     }
@@ -112,7 +141,7 @@ const CourseDetail = () => {
                                     </motion.button>
 
                                     <button
-                                        onClick={() => addToCart({ id: courseId, title: course.title, price: course.price, image: course.image })}
+                                        onClick={() => addToCart({ id: course._id || course.id, title: course.title, price: course.price, image: course.image })}
                                         className="w-full py-6 border-2 border-gray-100 rounded-2xl font-black text-[11px] uppercase tracking-[0.4em] text-gray-500 hover:bg-gray-50 transition-all mb-10"
                                     >
                                         Add to Cart

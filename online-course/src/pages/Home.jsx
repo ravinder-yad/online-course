@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import {
     FaSearch, FaBars, FaTimes, FaChevronDown, FaShoppingCart, FaStar,
     FaPlayCircle, FaUsers, FaArrowRight, FaCheck, FaClock, FaLinkedin,
@@ -194,13 +195,7 @@ const Categories = () => {
     );
 };
 
-const BestSellingCourses = ({ onEnroll, onAddToCart }) => {
-    const courses = [
-        { id: 1, t: "Modern Fullstack Architecture", i: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800", p: "129", a: "David Miller", l: "85", h: "42" },
-        { id: 2, t: "Advanced Product Design Concepts", i: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=800", p: "99", a: "Sarah Johnson", l: "64", h: "28" },
-        { id: 3, t: "AI For Software Engineers", i: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800", p: "149", a: "Alex Rivera", l: "120", h: "55" },
-    ];
-
+const BestSellingCourses = ({ courses, isLoading, onEnroll, onAddToCart }) => {
     return (
         <section className="py-32 bg-gray-50">
             <div className="max-w-7xl mx-auto px-6">
@@ -212,55 +207,64 @@ const BestSellingCourses = ({ onEnroll, onAddToCart }) => {
                     <Link to="/courses" className="px-10 py-4 bg-white border border-gray-200 rounded-[1.5rem] font-black text-xs uppercase tracking-widest text-gray-900 hover:bg-gray-950 hover:text-white transition-all shadow-xl shadow-gray-200/50">View Professional Catalog</Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    {courses.map((c, i) => (
-                        <motion.div
-                            key={i}
-                            whileHover={{ y: -20 }}
-                            className="bg-white rounded-[4rem] overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-gray-100 transition-all group"
-                        >
-                            <div className="relative h-72 overflow-hidden">
-                                <img src={c.i} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Course" />
-                                <div className="absolute top-8 left-8 bg-gray-950/40 backdrop-blur-md text-white px-5 py-2 rounded-full font-black text-[10px] uppercase tracking-[0.2em] border border-white/10">Bestseller</div>
-                                <div className="absolute bottom-6 left-8 right-8 flex justify-between items-center translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
-                                    <div className="p-3 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 text-white"><FaHeart size={14} /></div>
-                                    <div className="p-3 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 text-white flex items-center gap-2 font-bold text-xs"><FaClock /> {c.h}h</div>
-                                </div>
-                            </div>
-                            <div className="p-10">
-                                <div className="flex items-center gap-2 text-yellow-500 mb-6 font-black text-sm"><FaStar /> 4.9 <span className="text-gray-300 font-bold ml-1 tracking-widest text-[10px] uppercase">(2.4k)</span></div>
-                                <Link to={`/course/${c.id}`}><h4 className="text-2xl font-black text-gray-950 mb-8 leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{c.t}</h4></Link>
-                                <div className="flex items-center justify-between mb-8 group-hover:opacity-100 transition-opacity">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600"><FaUserTie size={18} /></div>
-                                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{c.a}</span>
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20">
+                        <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-6"></div>
+                        <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-[10px]">Loading Best Sellers...</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                        {courses.map((c, i) => (
+                            <motion.div
+                                key={i}
+                                whileHover={{ y: -20 }}
+                                className="bg-white rounded-[4rem] overflow-hidden shadow-sm hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-gray-100 transition-all group"
+                            >
+                                <div className="relative h-72 overflow-hidden">
+                                    <img src={c.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Course" />
+                                    <div className="absolute top-8 left-8 bg-gray-950/40 backdrop-blur-md text-white px-5 py-2 rounded-full font-black text-[10px] uppercase tracking-[0.2em] border border-white/10">Bestseller</div>
+                                    <div className="absolute bottom-6 left-8 right-8 flex justify-between items-center translate-y-20 group-hover:translate-y-0 transition-transform duration-500">
+                                        <div className="p-3 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 text-white"><FaHeart size={14} /></div>
+                                        <div className="p-3 bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 text-white flex items-center gap-2 font-bold text-xs"><FaClock /> {c.duration}</div>
                                     </div>
-                                    <div className="text-[10px] font-black text-gray-400 bg-gray-100 px-3 py-1 rounded-lg uppercase tracking-widest">{c.l} Lessons</div>
                                 </div>
-                                <div className="pt-8 border-t border-gray-50">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-sm font-black text-indigo-400">$</span>
-                                            <span className="text-4xl font-black text-gray-950">{c.p}</span>
+                                <div className="p-10">
+                                    <div className="flex items-center gap-2 text-yellow-500 mb-6 font-black text-sm"><FaStar /> {c.rating} <span className="text-gray-300 font-bold ml-1 tracking-widest text-[10px] uppercase">({c.reviews})</span></div>
+                                    <Link to={`/course/${c.id}`}><h4 className="text-2xl font-black text-gray-950 mb-8 leading-tight group-hover:text-indigo-600 transition-colors uppercase tracking-tight line-clamp-2">{c.title}</h4></Link>
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 overflow-hidden">
+                                                <img src={c.instructorImg} alt="" className="w-full h-full object-cover" />
+                                            </div>
+                                            <span className="text-xs font-black text-gray-400 uppercase tracking-widest">{c.instructor}</span>
+                                        </div>
+                                        <div className="text-[10px] font-black text-gray-400 bg-gray-100 px-3 py-1 rounded-lg uppercase tracking-widest">{c.curriculum?.length || 0} Modules</div>
+                                    </div>
+                                    <div className="pt-8 border-t border-gray-50">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-sm font-black text-indigo-400">$</span>
+                                                <span className="text-4xl font-black text-gray-950">{c.price}</span>
+                                            </div>
+                                            <button
+                                                onClick={() => onEnroll(c.title, c.price)}
+                                                className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-950 transition-all shadow-xl shadow-indigo-100"
+                                            >
+                                                Enroll Now
+                                            </button>
                                         </div>
                                         <button
-                                            onClick={() => onEnroll(c.t, c.p)}
-                                            className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-950 transition-all shadow-xl shadow-indigo-100"
+                                            onClick={() => onAddToCart({ id: c._id || c.id, title: c.title, price: Number(c.price), image: c.image })}
+                                            className="w-full py-4 border-2 border-gray-100 rounded-2xl font-black text-[10px] uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-all"
                                         >
-                                            Enroll Now
+                                            Add to Cart
                                         </button>
                                     </div>
-                                    <button
-                                        onClick={() => onAddToCart({ id: c.id, title: c.t, price: Number(c.p), image: c.i })}
-                                        className="w-full py-4 border-2 border-gray-100 rounded-2xl font-black text-[10px] uppercase tracking-widest text-gray-400 hover:bg-gray-50 transition-all"
-                                    >
-                                        Add to Cart
-                                    </button>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
             </div>
         </section>
     );
@@ -448,9 +452,28 @@ const FAQ = () => {
 
 // --- MAIN WRAPPER ---
 const Home = () => {
+    const [courses, setCourses] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState({ t: "", p: "" });
     const { addToCart } = useCart();
+
+    useEffect(() => {
+        const fetchTopCourses = async () => {
+            try {
+                setIsLoading(true);
+                const res = await axios.get("/api/courses");
+                // Get top 3 rated courses for best sellers
+                const topCourses = res.data.slice(0, 3);
+                setCourses(topCourses);
+            } catch (err) {
+                console.error("Error fetching home courses:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchTopCourses();
+    }, []);
 
     const handleEnroll = (title, price) => {
         setSelectedCourse({ t: title, p: price });
@@ -467,7 +490,7 @@ const Home = () => {
             <Hero />
             <StatsBar />
             <Categories />
-            <BestSellingCourses onEnroll={handleEnroll} onAddToCart={handleAddToCart} />
+            <BestSellingCourses courses={courses} isLoading={isLoading} onEnroll={handleEnroll} onAddToCart={handleAddToCart} />
             <WhyChooseUs />
             <Testimonials />
             <CTASection />
