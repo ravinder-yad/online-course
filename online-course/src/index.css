@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,21 +7,48 @@
 @layer base {
   body {
     @apply bg-[#F9FAFB] text-[#111827] font-sans antialiased;
+    font-family: "Inter", "Poppins", sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-xl shadow-lg hover:shadow-primary/30 transition-all duration-300 transform hover:-translate-y-1;
+    @apply px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all duration-300 transform hover:-translate-y-1 active:scale-95;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-white text-primary border-2 border-primary/10 font-semibold rounded-xl shadow-sm hover:border-primary/30 transition-all duration-300;
+    @apply px-8 py-4 bg-white text-gray-700 border-2 border-gray-100 font-bold rounded-2xl shadow-sm hover:border-primary/30 transition-all duration-300 transform hover:-translate-y-1 active:scale-95;
   }
 
-  .card {
-    @apply bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden;
+  .card-premium {
+    @apply bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 border border-gray-100/50 overflow-hidden;
   }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  .section-padding {
+    @apply py-24 px-6 lg:px-12 max-w-[1440px] mx-auto;
+  }
+}
+
+.bg-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, #6366f1 1px, transparent 1px);
+  background-size: 30px 30px;
+  opacity: 0.05;
 }
 
 /* Custom Scrollbar */
@@ -27,8 +56,19 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-gray-50;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary/40 rounded-full hover:bg-primary/60 transition-colors;
+  @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors;
 }
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+

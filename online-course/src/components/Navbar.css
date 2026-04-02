@@ -1,0 +1,53 @@
+/* Navbar glassmorphism and specific animations */
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.nav-link-ltr {
+  position: relative;
+}
+
+.nav-link-ltr::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  display: block;
+  margin-top: 5px;
+  right: 0;
+  background: #6366f1;
+  transition: width .3s ease;
+  -webkit-transition: width .3s ease;
+}
+
+.nav-link-ltr:hover::after {
+  width: 100%;
+  left: 0;
+  background: #6366f1;
+}
+
+/* Mega menu animation */
+.mega-menu-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.mega-menu-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.mega-menu-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mega-menu-exit-active {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 300ms, transform 300ms;
+}

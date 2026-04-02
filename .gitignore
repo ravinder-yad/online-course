@@ -1,0 +1,6 @@
+online-course/node_modules/
+online-backend/node_modules/
+*.env
+.env
+dist/
+build/

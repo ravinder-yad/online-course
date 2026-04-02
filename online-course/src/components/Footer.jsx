@@ -1,62 +1,96 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { FaFacebook, FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+import React from 'react';
+import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
 
-const Footer = () => (
-    <footer className="bg-white pt-40 pb-12 border-t border-gray-50 selection:bg-indigo-600 selection:text-white mt-auto">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 mb-32">
-            <div className="lg:col-span-1">
-                <Link to="/" className="text-4xl font-black mb-10 tracking-tighter italic block">EDU<span className="text-indigo-600">FLOW.</span></Link>
-                <p className="text-gray-400 font-bold leading-relaxed mb-12 text-lg">We don't just teach code. We build careers. Join the elite rank of EduFlow graduates and lead the industry.</p>
-                <div className="flex gap-6">
-                    {[FaFacebook, FaLinkedin, FaTwitter, FaInstagram].map((Icon, i) => (
-                        <motion.a
-                            key={i}
-                            whileHover={{ y: -5, scale: 1.1 }}
-                            href="#"
-                            className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center border border-transparent hover:border-indigo-100 hover:text-indigo-600 hover:bg-white transition-all shadow-sm"
-                        >
-                            <Icon size={24} />
-                        </motion.a>
-                    ))}
-                </div>
-            </div>
+const Footer = () => {
+  return (
+    <footer className="bg-gray-900 border-t border-gray-800 pt-16 lg:pt-24 pb-12 overflow-hidden text-white/70">
+      <div className="section-padding grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+        {/* About Section */}
+        <div className="flex flex-col gap-8">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-black text-white text-2xl shadow-lg">E</div>
+             <span className="text-2xl font-black text-white tracking-widest uppercase">EduScale</span>
+          </div>
+          <p className="text-sm font-bold leading-relaxed tracking-tight italic">
+            Empowering curious minds with high-quality, project-based learning. Learn from the best world-class experts and join our global community.
+          </p>
+          <div className="flex gap-4">
+             {[FiFacebook, FiTwitter, FiInstagram, FiLinkedin].map((Icon, i) => (
+                <button key={i} className="w-10 h-10 rounded-xl bg-gray-800 border-2 border-gray-700/50 flex items-center justify-center text-white hover:bg-primary transition-all duration-300">
+                   <Icon />
+                </button>
+             ))}
+          </div>
+        </div>
 
-            {[
-                { t: "Platform", l: [{ n: "Our Catalog", h: "/courses" }, { n: "Membership", h: "/membership" }, { n: "Free Content", h: "/free-content" }, { n: "Certifications", h: "/certifications" }] },
-                { t: "Company", l: [{ n: "About Our Mission", h: "/about" }, { n: "Mentors", h: "/mentors" }, { n: "Careers (Hiring!)", h: "/careers" }, { n: "Impact", h: "/impact" }] },
-                { t: "Legal", l: [{ n: "Terms of Sale", h: "/terms" }, { n: "Privacy Policy", h: "/privacy" }, { n: "Cookie Policy", h: "/cookies" }, { n: "Accessibility", h: "/accessibility" }] }
-            ].map((col, i) => (
-                <div key={i}>
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-300 mb-12">{col.t}</h4>
-                    <ul className="space-y-6">
-                        {col.l.map((link, idx) => (
-                            <li key={idx}>
-                                <Link to={link.h} className="text-lg font-black text-gray-600 hover:text-indigo-600 transition-colors tracking-tight relative group block">
-                                    {link.n}
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 group-hover:w-full transition-all duration-500 rounded-full" />
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+        {/* Quick Links */}
+        <div className="flex flex-col gap-8">
+          <h4 className="text-xl font-black text-white uppercase tracking-widest border-b-2 border-primary w-fit pb-1">Quick Links</h4>
+          <ul className="flex flex-col gap-4 font-bold text-sm tracking-widest uppercase">
+            {['Explore Courses', 'About Us', 'Contact', 'Pricing', 'Terms of Service'].map(link => (
+               <li key={link}>
+                  <a href="#" className="hover:text-primary transition-colors flex items-center gap-2 group">
+                     <span className="w-0 group-hover:w-4 h-[2px] bg-primary transition-all duration-300"></span>
+                     {link}
+                  </a>
+               </li>
             ))}
+          </ul>
         </div>
 
-        <div className="pt-16 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-8 px-6">
-            <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Platform Status: Optimal</span>
-            </div>
-            <div className="text-[10px] font-black text-gray-200 uppercase tracking-[1em] mb-4 md:mb-0">EDUFLOW GLOBAL &copy; 2026</div>
-            <div className="flex gap-6 opacity-30">
-                <span className="text-[9px] font-black tracking-widest">VISA</span>
-                <span className="text-[9px] font-black tracking-widest">STRIPE</span>
-                <span className="text-[9px] font-black tracking-widest">PAYPAL</span>
-            </div>
+        {/* Categories */}
+        <div className="flex flex-col gap-8">
+          <h4 className="text-xl font-black text-white uppercase tracking-widest border-b-2 border-primary w-fit pb-1">Top Topics</h4>
+          <ul className="flex flex-col gap-4 font-bold text-sm tracking-widest uppercase">
+             {['Web Development', 'Data Science', 'UI/UX Design', 'App Development', 'AI / ML'].map(cat => (
+                <li key={cat}>
+                   <a href="#" className="hover:text-primary transition-colors flex items-center gap-2 group">
+                      <span className="w-0 group-hover:w-4 h-[2px] bg-primary transition-all duration-300"></span>
+                      {cat}
+                   </a>
+                </li>
+             ))}
+          </ul>
         </div>
+
+        {/* Newsletter */}
+        <div className="flex flex-col gap-8">
+          <h4 className="text-xl font-black text-white uppercase tracking-widest border-b-2 border-primary w-fit pb-1">Newsletter</h4>
+          <p className="text-sm font-bold leading-relaxed italic">
+            Subscribe to get latest updates and new course offers from our platform.
+          </p>
+          <div className="flex flex-col gap-4">
+             <div className="relative group">
+                <input 
+                   type="email" 
+                   placeholder="Enter your email" 
+                   className="w-full bg-gray-800 border-2 border-gray-700 rounded-2xl px-6 py-4 text-white text-sm font-bold tracking-widest placeholder:text-gray-500 focus:outline-none focus:border-primary transition-all duration-300"
+                />
+                <button className="absolute right-2 top-2 bottom-2 px-6 bg-primary text-white rounded-xl shadow-lg hover:shadow-primary/20 transition-all font-black text-xs uppercase tracking-widest">
+                   Join
+                </button>
+             </div>
+             <div className="flex items-center gap-3 text-sm font-bold italic">
+                <FiMail className="text-primary" />
+                <span>support@eduscale.com</span>
+             </div>
+             <div className="flex items-center gap-3 text-sm font-bold italic">
+                <FiPhone className="text-primary" />
+                <span>+1 234 567 890</span>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="section-padding border-t border-gray-800/50 mt-12 lg:mt-16 pt-8 lg:pt-12 flex flex-col lg:flex-row justify-between items-center gap-6 text-[10px] lg:text-sm font-black uppercase tracking-widest text-center lg:text-left">
+         <p className="opacity-60 italic">© 2024 EduScale Learning. Empowering the next generation of builders.</p>
+         <div className="flex gap-6 lg:gap-8 italic">
+            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-primary transition-colors">Cookies</a>
+         </div>
+      </div>
     </footer>
-);
+  );
+};
 
 export default Footer;

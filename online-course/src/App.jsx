@@ -1,61 +1,40 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Courses from "./pages/Courses";
-import Mentors from "./pages/Mentors";
-import Membership from "./pages/Membership";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Category from "./pages/Category";
-import CourseDetail from "./pages/CourseDetail";
+import React from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import CoursesPage from './pages/CoursesPage';
+import LiveClasses from './pages/LiveClasses';
+import LiveRoom from './pages/LiveRoom';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import ForgotPassword from './pages/ForgotPassword';
 
-import { CartProvider } from "./context/CartContext";
-import { ToastProvider } from "./context/ToastContext";
-import { WishlistProvider } from "./context/WishlistContext";
-import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider } from "./context/AuthContext";
-import AboutUs from "./pages/AboutUs";
-import Careers from "./pages/Careers";
-import Impact from "./pages/Impact";
-import FreeContent from "./pages/FreeContent";
-import Certifications from "./pages/Certifications";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Cookies from "./pages/Cookies";
-import Accessibility from "./pages/Accessibility";
+import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
+import AddProject from './pages/AddProject';
+import MyProjects from './pages/MyProjects';
 
 function App() {
+  const { pathname } = useLocation();
+  const isLiveRoom = pathname.startsWith('/live/') && pathname.split('/').length > 2;
+  
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <WishlistProvider>
-            <CartProvider>
-              <Router>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/courses" element={<Courses />} />
-                  <Route path="/mentors" element={<Mentors />} />
-                  <Route path="/membership" element={<Membership />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/category/:id" element={<Category />} />
-                  <Route path="/course/:id" element={<CourseDetail />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/careers" element={<Careers />} />
-                  <Route path="/impact" element={<Impact />} />
-                  <Route path="/free-content" element={<FreeContent />} />
-                  <Route path="/certifications" element={<Certifications />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/cookies" element={<Cookies />} />
-                  <Route path="/accessibility" element={<Accessibility />} />
-                </Routes>
-              </Router>
-            </CartProvider>
-          </WishlistProvider>
-        </ToastProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <>
+      {!isLiveRoom && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects/:id" element={<ProjectDetailPage />} />
+        <Route path="/add-project" element={<AddProject />} />
+        <Route path="/my-projects" element={<MyProjects />} />
+        <Route path="/live" element={<LiveClasses />} />
+        <Route path="/live/:id" element={<LiveRoom />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Routes>
+    </>
   );
 }
 
